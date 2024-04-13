@@ -1,0 +1,107 @@
+   private void calculateExpenses() {
+       try {
+           double budget = Double.parseDouble(budgetField.getText());
+           double rent = Double.parseDouble(rentField.getText());
+           double bills = Double.parseDouble(billsField.getText());
+ 
+           double spending = budget * 0.5;
+           double savings = budget * 0.3;
+           double remaining = budget - rent - bills - spending;
+ 
+           resultArea.setText("Spending Money: $" + String.format("%.2f", spending) +
+                   "\nTo Save: $" + String.format("%.2f", savings) +
+                   "\nRemaining: $" + String.format("%.2f", remaining));
+ 
+           showGraphPopup(spending, savings, remaining);
+       } catch (NumberFormatException ex) {
+           resultArea.setText("Invalid input. Please enter valid numbers.");
+       }
+   }
+ 
+   private void addExpense() {
+       try {
+           double expense = Double.parseDouble(JOptionPane.showInputDialog(frame, "Enter expense amount:"));
+           expensesList.add(expense);
+           JOptionPane.showMessageDialog(frame, "Expense added successfully!");
+       } catch (NumberFormatException ex) {
+           JOptionPane.showMessageDialog(frame, "Invalid input. Please enter a valid
+ 
+number.");
+       }
+   }
+ 
+   private void viewExpenses() {
+       double totalExpenses = 0;
+       StringBuilder expensesDetails = new StringBuilder("Expenses List:\n");
+       for (Double expense : expensesList) {
+           expensesDetails.append("$").append(expense).append("\n");
+           totalExpenses += expense;
+       }
+       resultArea.setText(expensesDetails.toString() + "Total Expenses: $" + totalExpenses);
+   }
+ 
+   private void showGraphPopup(double spending, double savings, double remaining) {
+       double misc = 0;
+       for (Double expense : expensesList) {
+           misc += expense;
+       }
+ 
+       final double finalSpending = spending;
+       final double finalSavings = savings;
+       final double finalRemaining = remaining;
+       final double finalMisc = misc;
+ 
+       JFrame graphFrame = new JFrame("Expenses Graph");
+       graphFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       graphFrame.setSize(400, 300);
+ 
+       JPanel graphPanel = new JPanel() {
+           @Override
+           protected void paintComponent(Graphics g) {
+               super.paintComponent(g);
+               int total = (int) (finalSpending + finalSavings + finalRemaining + finalMisc);
+ 
+               int panelWidth = getWidth();
+               int panelHeight = getHeight();
+               int spendingHeight = (int) (finalSpending / total * panelHeight);
+               int savingsHeight = (int) (finalSavings / total * panelHeight);
+               int remainingHeight = (int) (finalRemaining / total * panelHeight);
+               int miscHeight = (int) (finalMisc / total * panelHeight);
+ 
+               g.setColor(Color.RED);
+               g.fillRect(50, panelHeight - spendingHeight, 50, spendingHeight);
+               g.drawString("Spending", 50, panelHeight - spendingHeight - 5);
+ 
+               g.setColor(Color.GREEN);
+               g.fillRect(150, panelHeight - savingsHeight, 50, savingsHeight);
+               g.drawString("Savings", 150, panelHeight - savingsHeight - 5);
+ 
+               g.setColor(Color.BLUE);
+               g.fillRect(250, panelHeight - remainingHeight, 50, remainingHeight);
+               g.drawString("Remaining", 250, panelHeight - remainingHeight - 5);
+ 
+               g.setColor(Color.ORANGE);
+               g.fillRect(350, panelHeight - miscHeight, 50, miscHeight);
+               g.drawString("Misc", 350, panelHeight - miscHeight - 5);
+ 
+               // Draw y-axis numbers
+               g.setColor(Color.BLACK);
+               g.drawString(Integer.toString(total), 30, 15);
+               g.drawString(Integer.toString(total / 2), 30, panelHeight / 2);
+               g.drawString("0", 30, panelHeight - 5);
+           }
+       };
+ 
+       graphFrame.add(graphPanel);
+       graphFrame.setVisible(true);
+   }
+ 
+   public static void main(String[] args) {
+       SwingUtilities.invokeLater(new Runnable() {
+           @Override
+           public void run() {
+               new ExpensesTracker();
+           }
+       });
+   }
+}
